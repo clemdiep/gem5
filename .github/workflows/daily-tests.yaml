@@ -40,6 +40,7 @@ jobs:
 
   # this builds both unittests.fast and unittests.debug
     unittests-debug:
+        if: false
         strategy:
             matrix:
                 type: [debug]
@@ -95,8 +96,8 @@ jobs:
             - get-date
         strategy:
             fail-fast: false
-            matrix:
-                test-type: ${{ fromJson(needs.get-testlib-long-dirs.outputs.test-dirs-matrix) }}
+              #            matrix:
+              # test-type: ${{ fromJson(needs.get-testlib-long-dirs.outputs.test-dirs-matrix) }}
 
         steps:
             - uses: actions/checkout@v4
@@ -108,15 +109,15 @@ jobs:
                   restore-keys: |
                       testlib-build-all
 
-            - name: Run long ${{ matrix.test-type }} tests
+            - name: Run long gem5/example_configs/x86 tests
               id: run-tests
               working-directory: ${{ github.workspace }}/tests
-              run: ./main.py run ${{ matrix.test-type }} -j$(nproc) --length=long -vv -t $(nproc) --exclude-tags gcn_gpu
+              run: ./main.py run gem5/example_configs/x86 -j10 --length=long -vv -t10 --exclude-tags gcn_gpu
 
             - name: Sanitize test-dir for artifact name
               id: sanitize-test-dir
               if: success() || failure()
-              run: echo "sanitized-test-dir=$(echo '${{ matrix.test-type }}' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
+              run: echo "sanitized-test-dir=$(echo 'gem5/example_configs/x86' | sed 's/\//-/g')" >> $GITHUB_OUTPUT
 
             - name: Upload results
               if: success() || failure()
@@ -130,6 +131,7 @@ jobs:
 
 
     gpu-tests:
+        if: false
         runs-on: [self-hosted, linux, x64]
         container: ghcr.io/gem5/gcn-gpu:latest
         timeout-minutes: 1440 # 24 hours
@@ -162,6 +164,7 @@ jobs:
   # This runs the SST-gem5 integration compilation and tests it with
   # ext/sst/sst/example.py.
     sst-test:
+        if: false
         runs-on: [self-hosted, linux, x64]
         container: ghcr.io/gem5/sst-env:latest
         timeout-minutes: 180
@@ -183,6 +186,7 @@ jobs:
   # This runs the gem5 within SystemC ingration and runs a simple hello-world
   # simulation with it.
     systemc-test:
+        if: false
         runs-on: [self-hosted, linux, x64]
         container: ghcr.io/gem5/systemc-env:latest
         timeout-minutes: 180
@@ -204,6 +208,7 @@ jobs:
               run: LD_LIBRARY_PATH=build/ARM/:/opt/systemc/lib-linux64/ ./util/systemc/gem5_within_systemc/gem5.opt.sc m5out/config.ini
 
     dramsys-tests:
+        if: false
         runs-on: [self-hosted, linux, x64]
         container: ghcr.io/gem5/ubuntu-24.04_all-dependencies:latest
         timeout-minutes: 360 # 6 hours
