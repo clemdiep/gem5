@@ -53,9 +53,9 @@ class PciBus(NoncoherentXBar):
 
     # Set some default values bases on IOXBar
     width = 16
-    frontend_latency = 2
-    forward_latency = 1
-    response_latency = 2
+    frontend_latency = 0
+    forward_latency = 0
+    response_latency = 0
 
 
 class PciConfigError(IsaFake):
